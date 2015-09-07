@@ -12,10 +12,18 @@ namespace FakeDb
     //     A database connection used to fake a database during testing.
     public class FakeDbConnection : IDbConnection
     {
+        public FakeDbConnection()
+        {
+            ConnectionString = "";
+            ConnectionTimeout = 15;
+            Database = "";
+            State = ConnectionState.Closed;
+        }
+
         //
         // Summary:
         //     Gets or sets the string used to open a database.
-        //     Not used anywhere by FakeDb
+        //     Not used by FakeDb
         //
         // Returns:
         //     A string containing connection settings.
@@ -25,15 +33,12 @@ namespace FakeDb
         // Summary:
         //     Gets the time to wait while trying to establish a connection before terminating
         //     the attempt and generating an error.
+        //     Not used by FakeDb
         //
         // Returns:
         //     The time (in seconds) to wait for a connection to open. The default value is
         //     15 seconds.
-        private int connectionTimeout = 15;
-        public int ConnectionTimeout {
-            get { return connectionTimeout; }
-            private set { connectionTimeout = value; }
-        }
+        public int ConnectionTimeout { get; private set; }
 
         //
         // Summary:
@@ -43,7 +48,7 @@ namespace FakeDb
         // Returns:
         //     The name of the current database or the name of the database to be used once
         //     a connection is open. The default value is an empty string.
-        public string Database { get; }
+        public string Database { get; private set; }
 
         //
         // Summary:
@@ -51,7 +56,7 @@ namespace FakeDb
         //
         // Returns:
         //     One of the System.Data.ConnectionState values.
-        public ConnectionState State { get; }
+        public ConnectionState State { get; private set; }
 
         //
         // Summary:
@@ -88,7 +93,10 @@ namespace FakeDb
         //     The name of the database to use in place of the current database.
         public void ChangeDatabase(string databaseName)
         {
-            throw new NotImplementedException();
+            if (State != ConnectionState.Open)
+                throw new InvalidOperationException();
+
+            Database = databaseName;
         }
 
         //
@@ -116,12 +124,11 @@ namespace FakeDb
         //     property of the provider-specific Connection object.
         public void Open()
         {
-            throw new NotImplementedException();
+            State = ConnectionState.Open;
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
     }
 }
