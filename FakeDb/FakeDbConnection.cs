@@ -59,7 +59,10 @@ namespace FakeDb
         //
         // Returns:
         //     An object representing the new transaction.
-        public IDbTransaction BeginTransaction();
+        public IDbTransaction BeginTransaction()
+        {
+            throw new NotImplementedException();
+        }
 
         //
         // Summary:
@@ -71,7 +74,10 @@ namespace FakeDb
         //
         // Returns:
         //     An object representing the new transaction.
-        public IDbTransaction BeginTransaction(IsolationLevel il);
+        public IDbTransaction BeginTransaction(IsolationLevel il)
+        {
+            throw new NotImplementedException();
+        }
 
         //
         // Summary:
@@ -80,12 +86,18 @@ namespace FakeDb
         // Parameters:
         //   databaseName:
         //     The name of the database to use in place of the current database.
-        public void ChangeDatabase(string databaseName);
+        public void ChangeDatabase(string databaseName)
+        {
+            throw new NotImplementedException();
+        }
 
         //
         // Summary:
         //     Closes the connection to the database.
-        public void Close();
+        public void Close()
+        {
+            throw new NotImplementedException();
+        }
 
         //
         // Summary:
@@ -93,13 +105,19 @@ namespace FakeDb
         //
         // Returns:
         //     A Command object associated with the connection.
-        public IDbCommand CreateCommand();
+        public IDbCommand CreateCommand()
+        {
+            throw new NotImplementedException();
+        }
 
         //
         // Summary:
         //     Opens a database connection with the settings specified by the ConnectionString
         //     property of the provider-specific Connection object.
-        public void Open();
+        public void Open()
+        {
+            throw new NotImplementedException();
+        }
 
         public void Dispose()
         {

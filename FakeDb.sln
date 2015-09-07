@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeDb", "./FakeDb/FakeDb.csproj", "{7B00B3F7-1FAE-49FA-93C8-8E867217EA77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeDb", "FakeDb\FakeDb.csproj", "{7B00B3F7-1FAE-49FA-93C8-8E867217EA77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeDb.Tests", "FakeDb.Tests\FakeDb.Tests.csproj", "{3AEC04EC-FE8E-4353-B033-83E331132CBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{7B00B3F7-1FAE-49FA-93C8-8E867217EA77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B00B3F7-1FAE-49FA-93C8-8E867217EA77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B00B3F7-1FAE-49FA-93C8-8E867217EA77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AEC04EC-FE8E-4353-B033-83E331132CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AEC04EC-FE8E-4353-B033-83E331132CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AEC04EC-FE8E-4353-B033-83E331132CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AEC04EC-FE8E-4353-B033-83E331132CBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
