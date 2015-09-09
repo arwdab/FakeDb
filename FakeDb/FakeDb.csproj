@@ -40,8 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FakeDataParameter.cs" />
+    <Compile Include="FakeDataParameterCollection.cs" />
+    <Compile Include="FakeDataReader.cs" />
+    <Compile Include="FakeDataRecord.cs" />
     <Compile Include="FakeDbCommand.cs" />
     <Compile Include="FakeDbConnection.cs" />
+    <Compile Include="FakeDbDataParameter.cs" />
+    <Compile Include="FakeDbTransaction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
