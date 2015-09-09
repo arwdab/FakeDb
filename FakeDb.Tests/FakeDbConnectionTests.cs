@@ -72,5 +72,16 @@ namespace FakeDb.Tests
 
             Assert.Equal<string>("dummy", sut.Database);
         }
+
+        [Fact]
+        public void Close_WhenStateIsOpen_SetsStateToClosed()
+        {
+            var sut = new FakeDbConnection();
+            sut.Open();
+
+            sut.Close();
+
+            Assert.Equal<ConnectionState>(ConnectionState.Closed, sut.State);
+        }
     }
 }

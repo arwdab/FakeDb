@@ -23,7 +23,6 @@ namespace FakeDb
         //
         // Summary:
         //     Gets or sets the string used to open a database.
-        //     Not used by FakeDb
         //
         // Returns:
         //     A string containing connection settings.
@@ -33,7 +32,6 @@ namespace FakeDb
         // Summary:
         //     Gets the time to wait while trying to establish a connection before terminating
         //     the attempt and generating an error.
-        //     Not used by FakeDb
         //
         // Returns:
         //     The time (in seconds) to wait for a connection to open. The default value is
@@ -55,7 +53,7 @@ namespace FakeDb
         //     Gets the current state of the connection.
         //
         // Returns:
-        //     One of the System.Data.ConnectionState values.
+        //     One of the System.Data.ConnectionState values. Thedefault value is Closed.
         public ConnectionState State { get; private set; }
 
         //
@@ -104,7 +102,7 @@ namespace FakeDb
         //     Closes the connection to the database.
         public void Close()
         {
-            throw new NotImplementedException();
+            State = ConnectionState.Closed;
         }
 
         //
