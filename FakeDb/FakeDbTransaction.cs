@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FakeDb
 {    //
@@ -11,33 +7,37 @@ namespace FakeDb
     //     Represents a transaction to be performed at a data source
     public class FakeDbTransaction : IDbTransaction
     {
+        private bool commitedOrRollbacked = false;
+
+        public FakeDbTransaction(IDbConnection connection)
+            : this(connection, IsolationLevel.ReadCommitted)
+        {
+        }
+
+        public FakeDbTransaction(IDbConnection connection, IsolationLevel isolationLevel)
+        {
+            if (connection == null)
+                throw new ArgumentNullException("connection");
+
+            Connection = connection;
+            IsolationLevel = isolationLevel;
+        }
+
         //
         // Summary:
         //     Specifies the Connection object to associate with the transaction.
         //
         // Returns:
         //     The Connection object to associate with the transaction.
-        public IDbConnection Connection
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public IDbConnection Connection { get; private set; }
 
         //
         // Summary:
         //     Specifies the System.Data.IsolationLevel for this transaction.
         //
-        // Returns:
+        // Returns: 
         //     The System.Data.IsolationLevel for this transaction. The default is ReadCommitted.
-        public IsolationLevel IsolationLevel
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public IsolationLevel IsolationLevel { get; private set; }
 
         //
         // Summary:
@@ -52,9 +52,12 @@ namespace FakeDb
         //     is broken.
         public void Commit()
         {
-            throw new NotImplementedException();
-        }        
-        
+            if (commitedOrRollbacked)
+                throw new InvalidOperationException("Transaction is already commited or rollbacked.");
+
+            commitedOrRollbacked = true;
+        }
+
         //
         // Summary:
         //     Rolls back a transaction from a pending state.
@@ -68,7 +71,10 @@ namespace FakeDb
         //     is broken.
         public void Rollback()
         {
-            throw new NotImplementedException();
+            if (commitedOrRollbacked)
+                throw new InvalidOperationException("Transaction is already commited or rollbacked.");
+
+            commitedOrRollbacked = true;
         }
 
         public void Dispose() { }
