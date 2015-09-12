@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FakeDb
 {
@@ -109,15 +105,19 @@ namespace FakeDb
         // Exceptions:
         //   T:System.ArgumentException:
         //     The property was not set one of the System.Data.DataRowVersion values.
+        private DataRowVersion sourceVersion = DataRowVersion.Current;
         public DataRowVersion SourceVersion
         {
             get
             {
-                throw new NotImplementedException();
+                return sourceVersion;
             }
             set
             {
-                throw new NotImplementedException();
+                if (!Enum.IsDefined(typeof(DataRowVersion), value))
+                    throw new ArgumentException("SourceVersion - value");
+
+                sourceVersion = value;
             }
         }
 
@@ -127,16 +127,6 @@ namespace FakeDb
         //
         // Returns:
         //     An System.Object that is the value of the parameter. The default value is null.
-        public object Value
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public object Value { get; set; }
     }
 }

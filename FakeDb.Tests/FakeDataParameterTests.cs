@@ -113,5 +113,52 @@ namespace FakeDb.Tests
 
             Assert.Equal<string>("", sut.SourceColumn);
         }
+
+        [Fact]
+        public void SourceVersion_Getter_ReturnsDefautValue()
+        {
+            var sut = new FakeDataParameter();
+
+            Assert.Equal<DataRowVersion>(DataRowVersion.Current, sut.SourceVersion);
+        }
+
+        [Theory]
+        [MemberData("ValidDataRowVersions")]
+        public void SourceVersion_SetterWithValidValues_GetterReturnsSetValue(DataRowVersion rowVersion)
+        {
+            var sut = new FakeDataParameter();
+
+            sut.SourceVersion = rowVersion;
+
+            Assert.Equal<DataRowVersion>(rowVersion, sut.SourceVersion);
+        }
+        public static IEnumerable<object[]> ValidDataRowVersions
+        {
+            get
+            {
+                foreach (var value in Enum.GetValues(typeof(DataRowVersion)))
+                {
+                    yield return new object[] { value };
+                }
+            }
+        }
+
+        [Theory]
+        [InlineData("-1")]
+        [InlineData("100")]
+        public void SourceVersion_SetterWithInvalidValue_Throws(string invalidValue)
+        {
+            var sut = new FakeDataParameter();
+
+            Assert.Throws<ArgumentException>(() => sut.SourceVersion = (DataRowVersion)Enum.Parse(typeof(DataRowVersion), invalidValue));
+        }
+
+        [Fact]
+        public void Value_ReturnsDefaultValue()
+        {
+            var sut = new FakeDataParameter();
+
+            Assert.Equal<object>(null, sut.Value);
+        }
     }
 }
