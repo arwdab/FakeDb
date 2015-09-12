@@ -9,11 +9,28 @@ namespace FakeDb
     {
         private bool commitedOrRollbacked = false;
 
+        //
+        // Summary:
+        //     Initializes a new instance of the FakeDb.FakeDbTransaction class.
+        //
+        // Parameters:
+        //   connection:
+        //     The Connection object to associate with the transaction.
         public FakeDbTransaction(IDbConnection connection)
             : this(connection, IsolationLevel.ReadCommitted)
         {
         }
 
+        //
+        // Summary:
+        //     Initializes a new instance of the FakeDb.FakeDbTransaction class.
+        //
+        // Parameters:
+        //   connection:
+        //     The Connection object to associate with the transaction.
+        //
+        //   isolationLevel:
+        //     Specifies the System.Data.IsolationLevel for this transaction
         public FakeDbTransaction(IDbConnection connection, IsolationLevel isolationLevel)
         {
             if (connection == null)

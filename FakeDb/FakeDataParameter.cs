@@ -10,6 +10,9 @@ namespace FakeDb
     //     columns
     public class FakeDataParameter : IDataParameter
     {
+        //
+        // Summary:
+        //     Initializes a new instance of the FakeDb.FakeDataParameter class.
         public FakeDataParameter()
         {
             ParameterName = "";

@@ -12,6 +12,9 @@ namespace FakeDb
     //     A database connection used to fake a database during testing.
     public class FakeDbConnection : IDbConnection
     {
+        //
+        // Summary:
+        //     Initializes a new instance of the FakeDb.FakeDbConnection class.
         public FakeDbConnection()
         {
             ConnectionString = "";
