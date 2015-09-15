@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 
 namespace FakeDb
@@ -10,12 +11,17 @@ namespace FakeDb
     //     columns.
     public class FakeDataParameterCollection : IDataParameterCollection
     {
+
+        private readonly List<IDataParameter> parameters;
+        private readonly object syncRoot;
+
         //
         // Summary:
         //     Initializes a new instance of the FakeDb.FakeDataParameterCollection class.
         public FakeDataParameterCollection()
         {
-
+            parameters = new List<IDataParameter>();
+            syncRoot = new Object();
         }
 
         //
@@ -30,27 +36,39 @@ namespace FakeDb
         //     The element at the specified index.
         //
         // Exceptions:
-        //   T:System.ArgumentOutOfRangeException:
-        //     index is not a valid index in the collection.
-        //
-        //   T:System.NotSupportedException:
+        //   T:System.InvalidCastException:
         //     The property is set and the Object is not implementing IDataParameter.
+        //
+        //   T:System.NullReferenceException:
+        //     The property is set and the value is a null reference.
+        //
+        //   T:System.IndexOutOfRangeException:
+        //     The specified index does not exist.
         public object this[int index]
         {
             get
             {
-                throw new NotImplementedException();
+                if (index < 0 || index >= parameters.Count)
+                    throw new IndexOutOfRangeException("index");
+
+                return parameters[index];
             }
 
             set
             {
-                throw new NotImplementedException();
+                if (index < 0 || index >= parameters.Count)
+                    throw new IndexOutOfRangeException("index");
+
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
+                parameters[index] = (IDataParameter)value;
             }
         }
 
         //
         // Summary:
-        //     Gets or sets the parameter at the specified index.
+        //     Gets or sets the parameter with the specified name.
         //
         // Parameters:
         //   parameterName:
@@ -60,18 +78,39 @@ namespace FakeDb
         //     An System.Object at the specified index.
         //
         // Exceptions:
-        //   T:System.NotSupportedException:
+        //   T:System.InvalidCastException:
         //     The property is set and the Object is not implementing IDataParameter.
+        //
+        //   T:System.IndexOutOfRangeException:
+        //     The specified index does not exist.
         public object this[string parameterName]
         {
             get
             {
-                throw new NotImplementedException();
+                foreach (var parameter in parameters)
+                {
+                    if (parameter.ParameterName == parameterName)
+                        return parameter;
+                }
+
+                throw new IndexOutOfRangeException("parameterName");
             }
 
             set
             {
-                throw new NotImplementedException();
+                for (int i = 0; i < parameters.Count; i++)
+                {
+                    if (parameters[i].ParameterName == parameterName)
+                    {
+                        if (value == null)
+                            throw new ArgumentNullException("value");
+
+                        parameters[i] = (IDataParameter)value;
+                        return;
+                    }
+                }
+
+                throw new IndexOutOfRangeException("parameterName");
             }
         }
 
@@ -85,7 +124,7 @@ namespace FakeDb
         {
             get
             {
-                throw new NotImplementedException();
+                return parameters.Count;
             }
         }
 
@@ -99,7 +138,7 @@ namespace FakeDb
         {
             get
             {
-                throw new NotImplementedException();
+                return false;
             }
         }
 
@@ -113,7 +152,7 @@ namespace FakeDb
         {
             get
             {
-                throw new NotImplementedException();
+                return false;
             }
         }
 
@@ -128,7 +167,7 @@ namespace FakeDb
         {
             get
             {
-                throw new NotImplementedException();
+                return false;
             }
         }
 
@@ -142,7 +181,7 @@ namespace FakeDb
         {
             get
             {
-                throw new NotImplementedException();
+                return syncRoot;
             }
         }
 
@@ -159,11 +198,17 @@ namespace FakeDb
         //     the item was not inserted into the collection.
         //
         // Exceptions:
-        //   T:System.NotSupportedException:
+        //   T:System.ArgumentNullException:
+        //     The added Object is null.
+        //
+        //   T:System.InvalidCastException:
         //     The added Object is not implementing IDataParameter. 
         public int Add(object value)
         {
-            throw new NotImplementedException();
+            if (value == null)
+                throw new ArgumentNullException("value");
+            
+            return ((IList)parameters).Add((IDataParameter)value);
         }
 
         //
@@ -171,7 +216,7 @@ namespace FakeDb
         //     Removes all items from the collection.
         public void Clear()
         {
-            throw new NotImplementedException();
+            parameters.Clear();
         }
 
         //
@@ -187,7 +232,7 @@ namespace FakeDb
         //     false.
         public bool Contains(object value)
         {
-            throw new NotImplementedException();
+            return ((IList)parameters).Contains(value);
         }
 
         //
@@ -203,7 +248,13 @@ namespace FakeDb
         //     true if the collection contains the parameter; otherwise, false.
         public bool Contains(string parameterName)
         {
-            throw new NotImplementedException();
+            foreach (var parameter in parameters)
+            {
+                if (parameter.ParameterName == parameterName)
+                    return true;
+            }
+
+            return false;
         }
 
         //
@@ -296,7 +347,7 @@ namespace FakeDb
         //   T:System.NullReferenceException:
         //     value is null reference in the collection.
         //
-        //   T:System.NotSupportedException:
+        //   T:System.InvalidCastException:
         //     The inserted Object is not implementing IDataParameter. 
         public void Insert(int index, object value)
         {
