@@ -207,7 +207,7 @@ namespace FakeDb
         {
             if (value == null)
                 throw new ArgumentNullException("value");
-            
+
             return ((IList)parameters).Add((IDataParameter)value);
         }
 
@@ -284,7 +284,7 @@ namespace FakeDb
         //     automatically to the type of the destination array.
         public void CopyTo(Array array, int index)
         {
-            throw new NotImplementedException();
+            ((IList)parameters).CopyTo(array, index);
         }
 
         //
@@ -296,7 +296,7 @@ namespace FakeDb
         //     the collection.
         public IEnumerator GetEnumerator()
         {
-            throw new NotImplementedException();
+            return ((IList)parameters).GetEnumerator();
         }
 
         //
@@ -311,7 +311,7 @@ namespace FakeDb
         //     The index of value if found in the collection; otherwise, -1.
         public int IndexOf(object value)
         {
-            throw new NotImplementedException();
+            return ((IList)parameters).IndexOf(value);
         }
 
         //
@@ -326,7 +326,13 @@ namespace FakeDb
         //     The zero-based location of the System.Data.IDataParameter within the collection.
         public int IndexOf(string parameterName)
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                if (parameters[i].ParameterName == parameterName)
+                    return i;
+            };
+
+            return -1;
         }
 
         //
@@ -345,13 +351,16 @@ namespace FakeDb
         //     index is not a valid index in the collection.
         //
         //   T:System.NullReferenceException:
-        //     value is null reference in the collection.
+        //     value is null.
         //
         //   T:System.InvalidCastException:
         //     The inserted Object is not implementing IDataParameter. 
         public void Insert(int index, object value)
         {
-            throw new NotImplementedException();
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            ((IList)parameters).Insert(index, (IDataParameter)value);
         }
 
         //
@@ -363,7 +372,7 @@ namespace FakeDb
         //     The object to remove from the collection.
         public void Remove(object value)
         {
-            throw new NotImplementedException();
+            ((IList)parameters).Remove(value);
         }
 
         //
@@ -379,7 +388,7 @@ namespace FakeDb
         //     index is not a valid index in the collection.
         public void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            parameters.RemoveAt(index);
         }
 
         //
@@ -391,7 +400,9 @@ namespace FakeDb
         //     The name of the parameter.
         public void RemoveAt(string parameterName)
         {
-            throw new NotImplementedException();
+            var index = IndexOf(parameterName);
+            if (index >= 0 && index < Count)
+                RemoveAt(index);
         }
     }
 }

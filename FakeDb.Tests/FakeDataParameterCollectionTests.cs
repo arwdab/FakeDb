@@ -18,7 +18,7 @@ namespace FakeDb.Tests
         {
             var sut = new FakeDataParameterCollection();
 
-            Assert.Equal<int>(0, sut.Count);
+            Assert.Equal(0, sut.Count);
         }
 
         [Theory]
@@ -33,7 +33,7 @@ namespace FakeDb.Tests
                 sut.Add(new FakeDataParameter());
             }
 
-            Assert.Equal<int>(parameterCount, sut.Count);
+            Assert.Equal(parameterCount, sut.Count);
         }
 
         [Theory]
@@ -218,7 +218,7 @@ namespace FakeDb.Tests
             var obj1 = sut.SyncRoot;
             var obj2 = sut.SyncRoot;
             var obj3 = sut.SyncRoot;
-            
+
             Assert.Same(obj1, sut.SyncRoot);
             Assert.Same(obj2, sut.SyncRoot);
             Assert.Same(obj3, sut.SyncRoot);
@@ -232,7 +232,7 @@ namespace FakeDb.Tests
 
             sut.Clear();
 
-            Assert.Equal<int>(0, sut.Count);
+            Assert.Equal(0, sut.Count);
         }
 
         [Fact]
@@ -298,14 +298,292 @@ namespace FakeDb.Tests
 
             Assert.False(sut.Contains(parameter.ParameterName));
         }
-        
 
         [Fact]
-        public void wtf2()
+        public void CopyTo_WithNullArray_Throws()
         {
-            var sut = new SqlCommand();
-            sut.Parameters.Add(new SqlParameter("Test", 2));
-            sut.Parameters["kk"] = new SqlParameter();
+            var sut = new FakeDataParameterCollection();
+
+            Assert.Throws<ArgumentNullException>(() => sut.CopyTo(null, 0));
+        }
+
+        [Fact]
+        public void CopyTo_WithNegativeIndex_Throws()
+        {
+            var sut = new FakeDataParameterCollection();
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => sut.CopyTo(new object[1], -1));
+        }
+
+        [Theory]
+        [MemberData("InvalidArraysFeeder")]
+        public void CopyTo_WithInvalidArrays_Throws(Array invalidArray)
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test3" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test4" });
+
+            Assert.Throws<ArgumentException>(() => sut.CopyTo(invalidArray, 2));
+        }
+        public static IEnumerable<object[]> InvalidArraysFeeder
+        {
+            get
+            {
+                yield return new object[] { new object[1, 1] };
+                yield return new object[] { new object[1] };
+                yield return new object[] { new object[4] };
+                yield return new object[] { new int[8] };
+
+            }
+        }
+
+        [Theory]
+        [MemberData("ValidArraysFeeder")]
+        public void CopyTo_WithValidParameters_CopiesValuesToArray(Array validArray, int index)
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test3" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test4" });
+
+            sut.CopyTo(validArray, index);
+
+            for (int i = 0; i < sut.Count; i++)
+            {
+                Assert.Same(sut[i], validArray.GetValue(index + i));
+            }
+        }
+        public static IEnumerable<object[]> ValidArraysFeeder
+        {
+            get
+            {
+                yield return new object[] { new object[7], 3 };
+                yield return new object[] { new object[6], 2 };
+                yield return new object[] { new object[5], 1 };
+                yield return new object[] { new object[4], 0 };
+            }
+        }
+
+        [Fact]
+        public void GetEnumerator_ReturnsEnumeratorWithAllParameters()
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+
+            var enumerator = sut.GetEnumerator();
+
+            enumerator.MoveNext();
+            Assert.Same(sut[0], enumerator.Current);
+            enumerator.MoveNext();
+            Assert.Same(sut[1], enumerator.Current);
+            Assert.False(enumerator.MoveNext());
+        }
+
+        [Theory]
+        [InlineData(new object[] { 0 })]
+        [InlineData(new object[] { 1 })]
+        [InlineData(new object[] { 2 })]
+        public void IndexOf_WithExistingParameter_ReturnsCorrectIndex(int expectedIndex)
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test3" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test4" });
+
+            var actualIndex = sut.IndexOf(sut[expectedIndex]);
+
+            Assert.Equal(expectedIndex, actualIndex);
+        }
+
+        [Fact]
+        public void IndexOf_WithNonExistingParameter_ReturnsCorrectNegativeOne()
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test3" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test4" });
+
+            var actualIndex = sut.IndexOf(new FakeDataParameter());
+
+            Assert.Equal(-1, actualIndex);
+        }
+
+        [Theory]
+        [InlineData(new object[] { "Test1", 0 })]
+        [InlineData(new object[] { "Test2", 1 })]
+        [InlineData(new object[] { "Test3", 2 })]
+        public void IndexOfParameterName_WithExistingParameterName_ReturnsCorrectIndex(string parameterName, int expectedIndex)
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test3" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test4" });
+
+            var actualIndex = sut.IndexOf(parameterName);
+
+            Assert.Equal(expectedIndex, actualIndex);
+        }
+
+        [Fact]
+        public void IndexOfParameterName_WithNonExistingParameterName_ReturnsCorrectNegativeOne()
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test3" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test4" });
+
+            var actualIndex = sut.IndexOf("NonExistingName");
+
+            Assert.Equal(-1, actualIndex);
+        }
+
+        [Fact]
+        public void Insert_WithValidParameters_InsertsParameterAtCorrectIndex()
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+
+            sut.Insert(1, new FakeDataParameter() { ParameterName = "Inserted" });
+
+            Assert.Equal(0, sut.IndexOf("Test1"));
+            Assert.Equal(1, sut.IndexOf("Inserted"));
+            Assert.Equal(2, sut.IndexOf("Test2"));
+        }
+
+        [Theory]
+        [InlineData(new object[] { -1 })]
+        [InlineData(new object[] { 3 })]
+        public void Insert_WithInvalidIndex_Throws(int invalidIndex)
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                sut.Insert(invalidIndex, new FakeDataParameter() { ParameterName = "Inserted" }));
+        }
+
+        [Fact]
+        public void Insert_WithNullParameter_Throws()
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+
+            Assert.Throws<ArgumentNullException>(() => sut.Insert(1, null));
+        }
+
+        [Fact]
+        public void Insert_WithParameterNotImplementingIDataParameter_Throws()
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+
+            Assert.Throws<InvalidCastException>(() => sut.Insert(1, new Object()));
+        }
+
+
+        [Fact]
+        public void Remove_WithExistingParameter_RemovesParameter()
+        {
+            var sut = new FakeDataParameterCollection();
+            var paramToRemove = new FakeDataParameter() { ParameterName = "ParamToRemove" };
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(paramToRemove);
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+
+            sut.Remove(paramToRemove);
+
+            Assert.Equal(-1, sut.IndexOf(paramToRemove));
+            Assert.Equal(0, sut.IndexOf("Test1"));
+            Assert.Equal(1, sut.IndexOf("Test2"));
+        }
+
+        [Fact]
+        public void Remove_WithNonExistingParameter_DoesNothing()
+        {
+            var sut = new FakeDataParameterCollection();
+            var paramToRemove = new FakeDataParameter() { ParameterName = "ParamToRemove" };
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test3" });
+
+            sut.Remove(paramToRemove);
+
+            Assert.Equal(-1, sut.IndexOf(paramToRemove));
+            Assert.Equal(0, sut.IndexOf("Test1"));
+            Assert.Equal(1, sut.IndexOf("Test2"));
+            Assert.Equal(2, sut.IndexOf("Test3"));
+        }
+
+        [Fact]
+        public void RemoveAtParameterName_WithExistingParameter_RemovesParameter()
+        {
+            var sut = new FakeDataParameterCollection();
+            var paramToRemove = new FakeDataParameter() { ParameterName = "ParamToRemove" };
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(paramToRemove);
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+
+            sut.RemoveAt("ParamToRemove");
+
+            Assert.Equal(-1, sut.IndexOf("ParamToRemove"));
+            Assert.Equal(0, sut.IndexOf("Test1"));
+            Assert.Equal(1, sut.IndexOf("Test2"));
+        }
+
+        [Fact]
+        public void RemoveAtParameterName_WithNonExistingParameter_DoesNothing()
+        {
+            var sut = new FakeDataParameterCollection();
+            var paramToRemove = new FakeDataParameter() { ParameterName = "ParamToRemove" };
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test3" });
+
+            sut.RemoveAt("ParamToRemove");
+
+            Assert.Equal(-1, sut.IndexOf("ParamToRemove"));
+            Assert.Equal(0, sut.IndexOf("Test1"));
+            Assert.Equal(1, sut.IndexOf("Test2"));
+            Assert.Equal(2, sut.IndexOf("Test3"));
+        }
+
+        [Fact]
+        public void RemoveAt_WithExistingIndex_RemovesParameter()
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test3" });
+
+            sut.RemoveAt(1);
+
+            Assert.Equal(-1, sut.IndexOf("Test2"));
+            Assert.Equal(0, sut.IndexOf("Test1"));
+            Assert.Equal(1, sut.IndexOf("Test3"));
+        }
+
+        [Theory]
+        [InlineData(new object[] { -1 })]
+        [InlineData(new object[] { 2 })]
+        public void RemoveAt_WithInvalidIndex_Throws(int invalidIndex)
+        {
+            var sut = new FakeDataParameterCollection();
+            sut.Add(new FakeDataParameter() { ParameterName = "Test1" });
+            sut.Add(new FakeDataParameter() { ParameterName = "Test2" });
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => sut.RemoveAt(invalidIndex));
         }
     }
 }
